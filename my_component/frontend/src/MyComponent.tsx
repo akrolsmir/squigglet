@@ -4,6 +4,7 @@ import {
   withStreamlitConnection,
 } from "streamlit-component-lib"
 import React, { ReactNode } from "react"
+import { SquiggleChart } from "@quri/squiggle-components"
 
 interface State {
   numClicks: number
@@ -19,8 +20,9 @@ class MyComponent extends StreamlitComponentBase<State> {
 
   public render = (): ReactNode => {
     // Arguments that are passed to the plugin in Python are accessible
-    // via `this.props.args`. Here, we access the "name" arg.
-    const name = this.props.args["name"]
+    // via `this.props.args`.
+    const code = this.props.args["code"]
+    const data = this.props.args["data"]
 
     // Streamlit sends us a theme object via props that we can use to ensure
     // that our component has visuals that match the active theme in a
@@ -40,24 +42,7 @@ class MyComponent extends StreamlitComponentBase<State> {
       style.outline = borderStyling
     }
 
-    // Show a button and some text.
-    // When the button is clicked, we'll increment our "numClicks" state
-    // variable, and send its new value back to Streamlit, where it'll
-    // be available to the Python program.
-    return (
-      <span>
-        Hello, {name}! &nbsp;
-        <button
-          style={style}
-          onClick={this.onClicked}
-          disabled={this.props.disabled}
-          onFocus={this._onFocus}
-          onBlur={this._onBlur}
-        >
-          Click Me!
-        </button>
-      </span>
-    )
+    return <SquiggleChart squiggleString={code} jsImports={data} />
   }
 
   /** Click handler for our "Click Me!" button. */
@@ -65,7 +50,7 @@ class MyComponent extends StreamlitComponentBase<State> {
     // Increment state.numClicks, and pass the new value back to
     // Streamlit via `Streamlit.setComponentValue`.
     this.setState(
-      prevState => ({ numClicks: prevState.numClicks + 1 }),
+      (prevState) => ({ numClicks: prevState.numClicks + 1 }),
       () => Streamlit.setComponentValue(this.state.numClicks)
     )
   }
